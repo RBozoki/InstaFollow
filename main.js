@@ -31,14 +31,14 @@ fs.readFile('login.txt', 'utf8', (err, data) => {
         }
 
         await new Promise(resolve => setTimeout(resolve, 3000));
-        const bodyText = await page.evaluate(() => {
+        const loginButton = await page.evaluate(() => {
             return Array.from(document.getElementsByTagName('button'))[6]
         });
 
-        const connectButton = bodyText
-        console.log(connectButton.outerHTML)
-        if (connectButton.length > 0) {
-            await connectButton[0].click();
+
+        console.log(loginButton.outerHTML)
+        if (loginButton.length > 0) {
+            await loginButton[0].click();
         } else {
             throw new Error("Le bouton n'a pas été trouvé");
 
