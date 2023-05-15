@@ -6,7 +6,6 @@ fs.readFile('login.txt', 'utf8', (err, data) => {
         console.error('Une erreur est survenue lors de la lecture du fichier', err);
         return;
     }
-    console.log("data", data);
     const lines = data.split('\n');
     const username = lines[0];
     const password = lines[1];
@@ -17,12 +16,11 @@ fs.readFile('login.txt', 'utf8', (err, data) => {
         const page = await browser.newPage();
 
         // Wait until page has loaded
-
         await page.goto('https://www.instagram.com/360_brat/', {
             waitUntil: 'networkidle0',
         });
 
-        // POP UP : DECLINER LES COOKIES
+        // POP UP : DECLINE COOKIES
         const button = await page.$x("//button[contains(., 'Decline optional cookies')]");
         if (button.length > 0) {
             await button[0].click();
@@ -30,23 +28,27 @@ fs.readFile('login.txt', 'utf8', (err, data) => {
             throw new Error("Le bouton n'a pas été trouvé");
         }
 
+        // wait loading
+        console.log("Waiting...")
         await new Promise(resolve => setTimeout(resolve, 3000));
-        const loginButton = await page.evaluate(() => {
-            return Array.from(document.getElementsByTagName('button'))[6]
-        });
+        console.log("Done !")
 
+        await page.waitForSelector('button');
 
-        console.log(loginButton.outerHTML)
-        if (loginButton.length > 0) {
-            await loginButton[0].click();
+        // Click login button
+        const buttons = await page.$$('button');
+        if (buttons.length >= 7) {
+            await buttons[6].click();
         } else {
-            throw new Error("Le bouton n'a pas été trouvé");
-
+            console.log('Il n\'y a pas assez de boutons sur la page');
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log("Waiting...")
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        console.log("Done !")
 
-        // Wait for log in form
+        const bodyText = await page.evaluate(() => document.body.innerText);
+        console.log(bodyText);
 
         await Promise.all([
             page.waitForSelector('[name="username"]'),
